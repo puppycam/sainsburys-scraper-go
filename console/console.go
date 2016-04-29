@@ -14,7 +14,7 @@ func main() {
 	productScraper := scraper.NewScraper(http.DefaultClient)
 	body, err := productScraper.GetContent(url)
 	if err != nil {
-		fmt.Println("Something bad happened!")
+		fmt.Println(err)
 		return
 	}
 
