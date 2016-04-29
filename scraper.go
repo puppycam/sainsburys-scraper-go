@@ -1,9 +1,6 @@
 package scraper
 
-import (
-	"io/ioutil"
-	"net/http"
-)
+import "io/ioutil"
 
 type Scraper struct {
 	httpClient HttpClient
@@ -14,7 +11,7 @@ func NewScraper(httpClient HttpClient) Scraper {
 }
 
 func (scraper Scraper) GetContent(url string) (body string, err error) {
-	resp, err := http.Get(url)
+	resp, err := scraper.httpClient.Get(url)
 	if err != nil {
 		return body, err
 	}
