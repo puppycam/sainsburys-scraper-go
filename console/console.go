@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,11 +13,11 @@ func main() {
 	url := os.Args[1]
 
 	productScraper := scraper.NewScraper(http.DefaultClient)
-	body, err := productScraper.GetContent(url)
+	product := productScraper.Scrape(url)
+	resp, err := json.Marshal(product)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
-	fmt.Println(body)
+	fmt.Println(string(resp))
 }
