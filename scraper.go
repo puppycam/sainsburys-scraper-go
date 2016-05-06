@@ -11,14 +11,17 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Scraper contains the httpClient field which has the custom HTTPClient type.
 type Scraper struct {
-	httpClient HttpClient
+	httpClient HTTPClient
 }
 
-func NewScraper(httpClient HttpClient) Scraper {
+// NewScraper returns a new Scraper with all of its required fields.
+func NewScraper(httpClient HTTPClient) Scraper {
 	return Scraper{httpClient: httpClient}
 }
 
+// Scrape takes a URL, gets its HTML content and returns a new Product with the required data.
 func (scraper Scraper) Scrape(url string) Product {
 	resp, err := scraper.getBodyContent(url)
 	if err != nil {

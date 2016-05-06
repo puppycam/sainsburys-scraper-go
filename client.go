@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
-type HttpClient interface {
+// HTTPClient is the interface that wraps the basic Get method.
+type HTTPClient interface {
 	Get(url string) (*http.Response, error)
 }
