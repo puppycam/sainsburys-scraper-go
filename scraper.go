@@ -22,16 +22,22 @@ func NewScraper(httpClient HTTPClient) Scraper {
 }
 
 // Scrape takes a URL, gets its HTML content and returns a new Product with the required data.
-func (scraper Scraper) Scrape(url string) Product {
+func (scraper Scraper) Scrape(url string) (products []Product) {
 	resp, err := scraper.getBodyContent(url)
 	if err != nil {
 		fmt.Println(err)
-		return Product{}
+		return
 	}
 
-	product := scraper.scrapeBodyContent(resp)
+	productLinks := scraper.scrapeProductListBodyContent(resp)
 
-	return product
+	for _, link := range productLinks {
+		body, _ := scraper.getBodyContent(link)
+		product := scraper.scrapeProductBodyContent(body)
+		products = append(products, product)
+	}
+
+	return products
 }
 
 func (scraper Scraper) getBodyContent(url string) (resp *http.Response, err error) {
@@ -43,7 +49,22 @@ func (scraper Scraper) getBodyContent(url string) (resp *http.Response, err erro
 	return resp, nil
 }
 
-func (scraper Scraper) scrapeBodyContent(resp *http.Response) Product {
+func (scraper Scraper) scrapeProductListBodyContent(resp *http.Response) []string {
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	links := doc.Find(".product .productInner").Map(func(i int, div *goquery.Selection) string {
+		href, _ := div.Find("h3 a").Attr("href")
+
+		return href
+	})
+
+	return links
+}
+
+func (scraper Scraper) scrapeProductBodyContent(resp *http.Response) Product {
 	size, err := strconv.Atoi(resp.Header.Get("Content-Length"))
 	if err != nil {
 		log.Fatal(err)
