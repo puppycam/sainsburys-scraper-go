@@ -25,6 +25,69 @@
 			"branch": "master",
 			"path": "/html",
 			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/encoding",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/encoding",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/encoding/charmap",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/encoding/charmap",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/internal/tag",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/internal/tag",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/internal/utf8internal",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/internal/utf8internal",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/language",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/language",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/runes",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/runes",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/transform",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "f773ec03ce334298742df7f3108fc0d402646d22",
+			"branch": "master",
+			"path": "/transform",
+			"notests": true
 		}
 	]
 }

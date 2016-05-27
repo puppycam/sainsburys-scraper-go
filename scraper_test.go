@@ -3,7 +3,6 @@ package scraper_test
 import (
 	"fmt"
 	"net/http"
-	"testing"
 
 	"github.com/danbondd/sainsburys-scraper-go"
 )
@@ -22,15 +21,7 @@ func (m mockHttpClient) Get(url string) (resp *http.Response, err error) {
 	return resp, nil
 }
 
-func getMockClient() scraper.Scraper {
-	client := scraper.NewScraper(mockHttpClient{})
-	return client
-}
-
-func TestSeomthing(t *testing.T) {
-	client := getMockClient()
-	_ = client.Scrape("http://fake.url")
-	// if err.Error() != notFound {
-	// 	t.Error("Something")
-	// }
+func getScraperWithMockHTTPClient() scraper.Scraper {
+	scraperMock := scraper.NewScraper(mockHttpClient{})
+	return scraperMock
 }

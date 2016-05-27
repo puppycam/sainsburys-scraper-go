@@ -4,6 +4,6 @@ package scraper
 type Product struct {
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
-	Size        int     `json:"size"`
+	Size        int64   `json:"size"`
 	UnitPrice   float64 `json:"unitprice"`
 }

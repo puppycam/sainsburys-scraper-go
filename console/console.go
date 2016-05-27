@@ -14,7 +14,7 @@ func main() {
 
 	productScraper := scraper.NewScraper(http.DefaultClient)
 	product := productScraper.Scrape(url)
-	resp, err := json.Marshal(product)
+	resp, err := json.MarshalIndent(product, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 	}
