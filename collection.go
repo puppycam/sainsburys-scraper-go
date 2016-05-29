@@ -22,7 +22,7 @@ func NewCollection(products []Product) *Collection {
 	return &Collection{products, total}
 }
 
-// MarshalJSON takes a collection of products and returns a correctly format list of results and total price.
+// MarshalJSON takes a collection of products and returns a correctly formatted list of results and total price.
 func (c *Collection) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"results": c.Results,
