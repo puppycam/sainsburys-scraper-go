@@ -19,9 +19,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	resp, err := json.MarshalIndent(product, "", "  ")
+	resp, err := json.MarshalIndent(product, "", "    ")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "error marshalling JSON: %v", err)
+		os.Exit(1)
 	}
 
 	fmt.Println(string(resp))

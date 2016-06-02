@@ -48,13 +48,11 @@ func (scraper Scraper) Scrape(url string) (*Collection, error) {
 	return NewCollection(products), nil
 }
 
-func (scraper Scraper) scrapeProductListBodyContent(resp *http.Response) ([]string, error) {
+func (scraper Scraper) scrapeProductListBodyContent(resp *http.Response) (links []string, err error) {
 	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		return nil, fmt.Errorf("error creating document from response: %v", err)
 	}
-
-	var links []string
 
 	doc.Find(".product .productInner").Each(func(i int, div *goquery.Selection) {
 		href, ok := div.Find("h3 a").Attr("href")
