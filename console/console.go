@@ -13,7 +13,12 @@ func main() {
 	url := os.Args[1]
 
 	productScraper := scraper.NewScraper(http.DefaultClient)
-	product := productScraper.Scrape(url)
+	product, err := productScraper.Scrape(url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
 	resp, err := json.MarshalIndent(product, "", "  ")
 	if err != nil {
 		fmt.Println(err)
