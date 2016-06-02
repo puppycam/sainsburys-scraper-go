@@ -8,3 +8,10 @@ import (
 type HTTPClient interface {
 	Get(url string) (*http.Response, error)
 }
+
+// HTTPResponse contains specific information about a GET request
+type HTTPResponse struct {
+	url      string
+	response *http.Response
+	err      error
+}

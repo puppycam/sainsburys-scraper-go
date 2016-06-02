@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -25,19 +26,24 @@ func NewScraper(httpClient HTTPClient) Scraper {
 func (scraper Scraper) Scrape(url string) (*Collection, error) {
 	var products []Product
 
-	resp, err := scraper.httpClient.Get(url)
+	res, err := scraper.httpClient.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("error getting response from %s: %v", url, err)
 	}
 
-	productLinks, err := scraper.scrapeProductListBodyContent(resp)
+	productLinks, err := scraper.scrapeProductListBodyContent(res)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
 	}
 
-	for _, link := range productLinks {
-		res, _ := scraper.httpClient.Get(link)
-		product, err := scraper.scrapeProductBodyContent(res)
+	productResponses := scraper.getProductPageResponses(productLinks)
+
+	for res := range productResponses {
+		if res.err != nil && res.response != nil && res.response.StatusCode == http.StatusOK {
+			res.response.Body.Close()
+			continue
+		}
+		product, err := scraper.scrapeProductBodyContent(res.response)
 		if err != nil {
 			log.Printf("error getting product data: %v", err)
 			continue
@@ -48,8 +54,27 @@ func (scraper Scraper) Scrape(url string) (*Collection, error) {
 	return NewCollection(products), nil
 }
 
-func (scraper Scraper) scrapeProductListBodyContent(resp *http.Response) (links []string, err error) {
-	doc, err := goquery.NewDocumentFromResponse(resp)
+func (scraper Scraper) getProductPageResponses(urls []string) (ch chan *HTTPResponse) {
+	ch = make(chan *HTTPResponse)
+	go func() {
+		var wg sync.WaitGroup
+		for _, url := range urls {
+			wg.Add(1)
+			go func(url string) {
+				defer wg.Done()
+				res, err := scraper.httpClient.Get(url)
+				ch <- &HTTPResponse{url, res, err}
+			}(url)
+		}
+		wg.Wait()
+		close(ch)
+	}()
+
+	return
+}
+
+func (scraper Scraper) scrapeProductListBodyContent(res *http.Response) (links []string, err error) {
+	doc, err := goquery.NewDocumentFromResponse(res)
 	if err != nil {
 		return nil, fmt.Errorf("error creating document from response: %v", err)
 	}
@@ -64,14 +89,14 @@ func (scraper Scraper) scrapeProductListBodyContent(resp *http.Response) (links 
 	return links, nil
 }
 
-func (scraper Scraper) scrapeProductBodyContent(resp *http.Response) (Product, error) {
-	size, err := strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 64)
+func (scraper Scraper) scrapeProductBodyContent(res *http.Response) (Product, error) {
+	size, err := strconv.ParseInt(res.Header.Get("Content-Length"), 10, 64)
 	if err != nil {
 		return Product{}, fmt.Errorf("error converting product size: %v", err)
 	}
 	size = (size / 1024)
 
-	doc, err := goquery.NewDocumentFromResponse(resp)
+	doc, err := goquery.NewDocumentFromResponse(res)
 	if err != nil {
 		return Product{}, fmt.Errorf("error creating document from response: %v", err)
 	}
