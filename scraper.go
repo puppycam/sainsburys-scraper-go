@@ -33,13 +33,13 @@ func (scraper Scraper) Scrape(url string) (*Collection, error) {
 
 	productLinks, err := scraper.scrapeProductListBodyContent(res)
 	if err != nil {
-		return nil, fmt.Errorf("%v", err)
+		return nil, fmt.Errorf("error getting product links: %v", err)
 	}
 
 	productResponses := scraper.getProductPageResponses(productLinks)
 
 	for res := range productResponses {
-		if res.err != nil && res.response != nil && res.response.StatusCode == http.StatusOK {
+		if res.err != nil || res.response == nil || res.response.StatusCode != http.StatusOK {
 			res.response.Body.Close()
 			continue
 		}
