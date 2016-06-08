@@ -20,7 +20,7 @@ func TestCollectionJSONOutput(t *testing.T) {
 	products = append(products, product)
 
 	collection := scraper.NewCollection(products)
-	expectedJSON := "{\"results\":[{\"description\":\"This is an awesome product!\",\"size\":\"40kb\",\"title\":\"Test Product\",\"unitprice\":10}],\"total\":\"10.00\"}"
+	expectedJSON := "{\"results\":[{\"description\":\"This is an awesome product!\",\"size\":\"40kb\",\"title\":\"Test Product\",\"unitprice\":\"10.00\"}],\"total\":\"10.00\"}"
 
 	json, err := json.Marshal(&collection)
 	if err != nil {

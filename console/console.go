@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,17 +14,19 @@ func main() {
 	url := os.Args[1]
 
 	productScraper := scraper.NewScraper(http.DefaultClient)
-	product, err := productScraper.Scrape(url)
+	collection, err := productScraper.Scrape(url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	resp, err := json.MarshalIndent(product, "", "    ")
+	b, err := json.MarshalIndent(collection, "", "    ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error marshalling JSON: %v", err)
 		os.Exit(1)
 	}
 
-	fmt.Println(string(resp))
+	b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
+
+	fmt.Println(string(b))
 }

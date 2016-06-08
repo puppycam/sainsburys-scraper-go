@@ -1,52 +1,77 @@
 package scraper_test
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
 	"github.com/danbondd/sainsburys-scraper-go"
 )
 
-type url map[string]*http.Response
+type urlResponse map[string]*http.Response
 
-type mockHttpClient struct {
-	url url
+type mockHTTPClient struct {
+	urls urlResponse
 }
 
-func (m mockHttpClient) Get(url string) (*http.Response, error) {
-	res, found := m.url[url]
+func (m mockHTTPClient) Get(url string) (*http.Response, error) {
+	res, found := m.urls[url]
 	if !found {
 		return nil, fmt.Errorf("Not Found")
 	}
 	return res, nil
 }
 
-func newMockHTTPClient() mockHttpClient {
-	url := make(url)
-	return mockHttpClient{url: url}
+func newMockHTTPClient() mockHTTPClient {
+	url := make(urlResponse)
+	return mockHTTPClient{urls: url}
+}
+
+func newHTTPResponse(body string) *http.Response {
+	headers := http.Header{}
+	headers["Content-Length"] = []string{"45"}
+
+	return &http.Response{
+		Body:       ioutil.NopCloser(bytes.NewBufferString(body)),
+		Header:     headers,
+		Request:    &http.Request{},
+		StatusCode: http.StatusOK,
+	}
 }
 
 func TestBadResponse(t *testing.T) {
 	mock := newMockHTTPClient()
 	scraper := scraper.NewScraper(mock)
 
-	_, err := scraper.Scrape("http://fake.url")
+	collection, err := scraper.Scrape("http://fake.url")
 	if err == nil {
-		t.Errorf("expected error")
+		t.Error("expected error, got: nil")
+	}
+
+	if collection != nil {
+		t.Error("expected collection to be nil")
 	}
 }
 
-// func TestScrape(t *testing.T) {
-// 	mock := newMockHTTPClient()
-// 	mock.url["http://correct.url"] = &http.Response{
-// 		Body:       ioutil.NopCloser(bytes.NewBufferString("Hello World")),
-// 		StatusCode: 200,
-// 	}
-// 	scraper := scraper.NewScraper(mock)
-//
-// 	_, err := scraper.Scrape("http://correct.url")
-// 	if err != nil {
-// 		t.Errorf("expected error: %v", err)
-// 	}
-// }
+func TestScrape(t *testing.T) {
+	mock := newMockHTTPClient()
+	mock.urls["http://fake.product/1"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 1</h1><p class='pricePerUnit'>£1.50</p><p class='productText'>This is a really awesome product!</p></div>")
+	mock.urls["http://fake.product/2"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 2</h1><p class='pricePerUnit'>£2.50</p><p class='productText'>This is a really awesome product!</p></div>")
+	mock.urls["http://product.list"] = newHTTPResponse("<div class='product'><div class='productInner'><h3><a href='http://fake.product/1'></a></h3></div></div><div class='product'><div class='productInner'><h3><a href='http://fake.product/2'></a></h3></div></div>")
+	scraper := scraper.NewScraper(mock)
+
+	collection, err := scraper.Scrape("http://product.list")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if len(collection.Results) == 0 {
+		t.Errorf("Results should contain 2 products, got: %d", len(collection.Results))
+	}
+
+	if collection.Total != 4.00 {
+		t.Errorf("Total should be 4.00, got: %.2f", collection.Total)
+	}
+}

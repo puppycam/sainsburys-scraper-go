@@ -19,6 +19,6 @@ func (p *Product) MarshalJSON() ([]byte, error) {
 		"title":       p.Title,
 		"description": p.Description,
 		"size":        fmt.Sprintf("%dkb", p.Size),
-		"unitprice":   p.UnitPrice,
+		"unitprice":   fmt.Sprintf("%.2f", p.UnitPrice),
 	})
 }

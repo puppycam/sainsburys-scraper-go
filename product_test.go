@@ -15,7 +15,7 @@ func TestProductJSONOutput(t *testing.T) {
 		UnitPrice:   10,
 	}
 
-	expectedJSON := "{\"description\":\"This is an awesome product!\",\"size\":\"40kb\",\"title\":\"Test Product\",\"unitprice\":10}"
+	expectedJSON := "{\"description\":\"This is an awesome product!\",\"size\":\"40kb\",\"title\":\"Test Product\",\"unitprice\":\"10.00\"}"
 
 	json, err := json.Marshal(&product)
 	if err != nil {
