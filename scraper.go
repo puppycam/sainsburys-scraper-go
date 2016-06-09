@@ -54,6 +54,7 @@ func (s Scraper) Scrape(url string) (*Collection, error) {
 	return NewCollection(products), nil
 }
 
+// getProductPageResponses takes a slice of urls and concurrently GETs a HTTP response for each.
 func (s Scraper) getProductPageResponses(urls []string) (ch chan *HTTPResponse) {
 	ch = make(chan *HTTPResponse)
 	go func() {
@@ -73,6 +74,8 @@ func (s Scraper) getProductPageResponses(urls []string) (ch chan *HTTPResponse) 
 	return
 }
 
+// scrapeProductListBodyContent takes a HTTP response from a product list page and scrapes
+// the body content for individual product page links.
 func (s Scraper) scrapeProductListBodyContent(res *http.Response) (links []string, err error) {
 	doc, err := goquery.NewDocumentFromResponse(res)
 	if err != nil {
@@ -89,6 +92,8 @@ func (s Scraper) scrapeProductListBodyContent(res *http.Response) (links []strin
 	return links, nil
 }
 
+// scrapeProductBodyContent takes a HTTP response from an individual product page and
+// scrapes the body content for all product data.
 func (s Scraper) scrapeProductBodyContent(res *http.Response) (Product, error) {
 	size, err := strconv.ParseInt(res.Header.Get("Content-Length"), 10, 64)
 	if err != nil {

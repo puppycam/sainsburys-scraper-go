@@ -41,7 +41,7 @@ func newHTTPResponse(body string) *http.Response {
 	}
 }
 
-func TestBadResponse(t *testing.T) {
+func TestScrapeWithBadResponse(t *testing.T) {
 	mock := newMockHTTPClient()
 	scraper := scraper.NewScraper(mock)
 
@@ -55,7 +55,7 @@ func TestBadResponse(t *testing.T) {
 	}
 }
 
-func TestScrape(t *testing.T) {
+func TestScrapeReturnsCorrectCollection(t *testing.T) {
 	mock := newMockHTTPClient()
 	mock.urls["http://fake.product/1"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 1</h1><p class='pricePerUnit'>£1.50</p><p class='productText'>This is a really awesome product!</p></div>")
 	mock.urls["http://fake.product/2"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 2</h1><p class='pricePerUnit'>£2.50</p><p class='productText'>This is a really awesome product!</p></div>")
