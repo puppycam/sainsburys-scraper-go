@@ -111,6 +111,10 @@ func (s Scraper) scrapeProductBodyContent(res *http.Response) (Product, error) {
 	desc := strings.TrimSpace(doc.Find(".productText").First().Text())
 	unitPrice := productSummary.Find("p.pricePerUnit").Text()
 
+	if len(title) == 0 || len(desc) == 0 || len(unitPrice) == 0 {
+		return Product{}, fmt.Errorf("error building product: empty attributes")
+	}
+
 	reg, err := regexp.Compile("[^0-9.]")
 	if err != nil {
 		return Product{}, fmt.Errorf("error compiling regex: %v", err)

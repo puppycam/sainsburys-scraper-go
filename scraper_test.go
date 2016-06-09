@@ -75,3 +75,25 @@ func TestScrapeReturnsCorrectCollection(t *testing.T) {
 		t.Errorf("Total should be 4.00, got: %.2f", collection.Total)
 	}
 }
+
+func TestScrapeWithIncompleteProductsReturnsEmptyCollection(t *testing.T) {
+	mock := newMockHTTPClient()
+	mock.urls["http://fake.product/1"] = newHTTPResponse("<div class='productSummary'><p class='pricePerUnit'>£1.50</p><p class='productText'>This is a really awesome product!</p></div>")
+	mock.urls["http://fake.product/2"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 2</h1><p class='productText'>This is a really awesome product!</p></div>")
+	mock.urls["http://fake.product/3"] = newHTTPResponse("<div class='productSummary'><h1>Awesome Product 2</h1><p class='pricePerUnit'>£2.50</p></div>")
+	mock.urls["http://product.list"] = newHTTPResponse("<div class='product'><div class='productInner'><h3><a href='http://fake.product/1'></a></h3></div></div><div class='product'><div class='productInner'><h3><a href='http://fake.product/2'></a></h3></div></div><div class='product'><div class='productInner'><h3><a href='http://fake.product/3'></a></h3></div></div>")
+	scraper := scraper.NewScraper(mock)
+
+	collection, err := scraper.Scrape("http://product.list")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if len(collection.Results) != 0 {
+		t.Errorf("Results should contain 0 products, got: %d", len(collection.Results))
+	}
+
+	if collection.Total != 0.00 {
+		t.Errorf("Total should be 0.00, got: %.2f", collection.Total)
+	}
+}
